@@ -1,4 +1,9 @@
 from flask import Flask, render_template
+from pymongo import MongoClient
+
+client = MongoClient()
+db = client.Contractor
+secrets = db.secrets
 
 app = Flask(__name__)
 
@@ -10,7 +15,7 @@ def index():
 @app.route('/secrets')
 def secrets_index():
     """Show all secrets"""
-    return render_template("secrets_index.html")
+    return render_template("secrets_index.html", secrets = secrets.find())
 
 @app.route('/secrets/new')
 def secrets_new():
