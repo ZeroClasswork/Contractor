@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
+from datetime import datetime
 
 client = MongoClient()
 db = client.Contractor
@@ -24,7 +25,16 @@ def secrets_new():
 
 @app.route('/secrets', methods=["POST"])
 def secrets_submit():
-    pass
+    """Submit a new secret."""
+    secret = {
+        "type": request.form.get("secret-type"),
+        "name": request.form.get("secret-holder"),
+        "text": request.form.get("secret-text"),
+        "timestamp": datetime.utcfromtimestamp(int(request.form.get("timestamp"))).strftime('%Y-%m-%d %H:%M:%S')
+    }
+    print(request.form.to_dict())
+    secrets.insert_one(secret)
+    return redirect(url_for("secrets_index"))
 
 @app.route('/secrets/:id')
 def secrets_show():
