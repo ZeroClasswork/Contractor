@@ -19,7 +19,7 @@ def secrets_index():
 
 @app.route('/secrets/new')
 def secrets_new():
-    """Create a new playlist"""
+    """Create a new secrets"""
     return render_template("secrets_new.html")
 
 @app.route('/secrets', methods=["POST"])
