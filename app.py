@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
 from datetime import datetime
+from bson.objectid import ObjectId
 
 client = MongoClient()
 db = client.Contractor
@@ -38,9 +39,10 @@ def secrets_submit():
     secrets.insert_one(secret)
     return redirect(url_for("secrets_index"))
 
-@app.route('/secrets/:id')
-def secrets_show():
-    pass
+@app.route('/secrets/<secret_id>')
+def secrets_show(secret_id):
+    secret = secrets.find_one({"_id" : ObjectId(secret_id)})
+    return render_template("secrets_show.html", secret=secret)
 
 @app.route('/secrets/:id/edit')
 def secrets_edit():
