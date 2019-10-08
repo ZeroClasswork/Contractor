@@ -26,11 +26,13 @@ def secrets_new():
 @app.route('/secrets', methods=["POST"])
 def secrets_submit():
     """Submit a new secret."""
+    timestamp = request.form.get("timestamp")
+    timestamp =  timestamp[4:6] + "-" + timestamp[6:] + "-" + timestamp[0:4]
     secret = {
         "type": request.form.get("secret-type"),
         "name": request.form.get("secret-holder"),
         "text": request.form.get("secret-text"),
-        "timestamp": datetime.utcfromtimestamp(int(request.form.get("timestamp"))).strftime('%Y-%m-%d %H:%M:%S')
+        "timestamp": timestamp
     }
     print(request.form.to_dict())
     secrets.insert_one(secret)
