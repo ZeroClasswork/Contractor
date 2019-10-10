@@ -45,12 +45,23 @@ def secrets_show(secret_id):
     return render_template("secrets_show.html", secret=secret)
 
 @app.route('/secrets/:id/edit')
-def secrets_edit():
-    pass
+def secrets_edit(secret_id):
+    """Show the edit form for a displayed secret."""
+    secret = secrets.find_one({'_id': ObjectId(secret_id)})
+    return render_template('secrets_edit.html', secret = secret)
 
 @app.route('/secrets/:id', methods=["POST"])
-def secrets_update():
-    pass
+def secrets_update(secret_id):
+    """Submit an edited secret."""
+    updated_secret = {
+        "type": request.form.get("secret-type"),
+        "name": request.form.get("secret-holder"),
+        "text": request.form.get("secret-text")
+    }
+    secrets.update_one(
+        {'_id': ObjectId(secret_id)},
+        {'$set': updated_secret})
+    return redirect(url_for('secret_show', secret_id=secret_id))
 
 @app.route('/secrets/:id/delete', methods=["POST"])
 def secrets_delete():
