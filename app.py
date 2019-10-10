@@ -12,7 +12,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     """Return homepage."""
-    return render_template("home.html")
+    return render_template("secrets_index.html", secrets = secrets.find())
 
 @app.route('/secrets')
 def secrets_index():
@@ -35,7 +35,6 @@ def secrets_submit():
         "text": request.form.get("secret-text"),
         "timestamp": timestamp
     }
-    print(request.form.to_dict())
     secrets.insert_one(secret)
     return redirect(url_for("secrets_index"))
 
@@ -44,28 +43,33 @@ def secrets_show(secret_id):
     secret = secrets.find_one({"_id" : ObjectId(secret_id)})
     return render_template("secrets_show.html", secret=secret)
 
-@app.route('/secrets/:id/edit')
+@app.route('/secrets/<secret_id>/edit')
 def secrets_edit(secret_id):
     """Show the edit form for a displayed secret."""
     secret = secrets.find_one({'_id': ObjectId(secret_id)})
     return render_template('secrets_edit.html', secret = secret)
 
-@app.route('/secrets/:id', methods=["POST"])
+@app.route('/secrets/<secret_id>', methods=["POST"])
 def secrets_update(secret_id):
     """Submit an edited secret."""
+    timestamp = request.form.get("timestamp")
+    timestamp =  timestamp[4:6] + "-" + timestamp[6:] + "-" + timestamp[0:4]
     updated_secret = {
         "type": request.form.get("secret-type"),
         "name": request.form.get("secret-holder"),
-        "text": request.form.get("secret-text")
+        "text": request.form.get("secret-text"), 
+        "timestamp": timestamp
     }
     secrets.update_one(
         {'_id': ObjectId(secret_id)},
         {'$set': updated_secret})
     return redirect(url_for('secret_show', secret_id=secret_id))
 
-@app.route('/secrets/:id/delete', methods=["POST"])
-def secrets_delete():
-    pass
+@app.route('/secrets/<secret_id>/delete', methods=["POST"])
+def secrets_delete(secret_id):
+    """Delete one secret."""
+    secrets.delete_one({'_id': ObjectId(secret_id)})
+    return redirect(url_for('secrets_index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
